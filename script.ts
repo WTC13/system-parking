@@ -8,9 +8,15 @@ interface veiculo{
     const $ = (query: string): HTMLInputElement | null => document.querySelector(query);
 
         function patio() {
-            function ler(){}
+            function ler(): veiculo[]{
+                return localStorage ? JSON.parse(localStorage.patio) : [];
+            }
 
-            function adicionar(veiculo: veiculo){
+            function salvar(veiculos: veiculo[]){
+                localStorage.setItem("patio", JSON.stringify(veiculos));
+            }
+
+            function adicionar(veiculo: veiculo, salva?: boolean){
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${veiculo.nome}</td>
@@ -22,17 +28,25 @@ interface veiculo{
                 `;
 
                 $("#patio")?.appendChild(row);
+
+
+                if(salva) salvar([...ler(), veiculo])
             }
 
             function remover(){}
 
-            function salvar(){}
+            function render(){
+                $("#patio")!.innerHTML = "";
+                const patio = ler();
 
-            function render(){}
+                if(patio.length){
+                    patio.forEach(veiculo => adicionar(veiculo))
+                }
+            }
 
             return{ ler, adicionar, remover, salvar, render };
         }
-
+    patio().render();
     $("#cadastrar")?.addEventListener("click", () =>{
         const nome = $("#nome")?.value;
         const placa = $("#placa")?.value;
@@ -42,6 +56,6 @@ interface veiculo{
             return false;
         }
 
-        patio().adicionar({nome, placa, entrada: new Date() });
+        patio().adicionar({nome, placa, entrada: new Date() }, true);
     })
 })();
